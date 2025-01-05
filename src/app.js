@@ -19,4 +19,8 @@ app.get("/", (req, res) => {
   return res.json({ status: "Status OK", statusCode: 200 });
 });
 
+import userRouter from "./routes/user.router.js";
+
+app.use("/api/users", userRouter);
+
 export { app };
