@@ -14,9 +14,13 @@ const keyPairSchema = new Schema(
     description: {
       type: String,
     },
-    owner: {
+    ownerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
     },
   },
   { timestamps: true }
