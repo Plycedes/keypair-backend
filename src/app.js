@@ -20,7 +20,9 @@ app.get("/", (req, res) => {
 });
 
 import userRouter from "./routes/user.router.js";
+import keyPairRouter from "./routes/keypair.router.js";
 
 app.use("/api/users", userRouter);
+app.use("/api/keypair", keyPairRouter);
 
 export { app };
