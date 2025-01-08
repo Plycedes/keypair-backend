@@ -4,6 +4,6 @@ import { createCategory } from "../controllers/category.controller.js";
 
 const router = Router();
 
-router.route("/create-category").post(createCategory);
+router.route("/create-category").post(verifyJWT, createCategory);
 
 export default router;
