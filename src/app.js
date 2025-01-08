@@ -21,8 +21,10 @@ app.get("/", (req, res) => {
 
 import userRouter from "./routes/user.router.js";
 import keyPairRouter from "./routes/keypair.router.js";
+import categoryRouter from "./routes/category.router.js";
 
 app.use("/api/users", userRouter);
 app.use("/api/keypair", keyPairRouter);
+app.use("/api/categories", categoryRouter);
 
 export { app };
