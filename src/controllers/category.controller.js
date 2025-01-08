@@ -13,7 +13,7 @@ export const createCategory = asyncHandler(async (req, res) => {
   }
 
   const existingCategory = await Category.findOne({
-    title,
+    $and: [{ title }, { creator: req.user }],
   });
 
   if (existingCategory) {
@@ -39,4 +39,24 @@ export const createCategory = asyncHandler(async (req, res) => {
         "Successfully created a new category"
       )
     );
+});
+
+export const deleteCategory = asyncHandler(async (req, res) => {
+  const { title } = req.body;
+
+  if (!title) {
+    throw new ApiError(400, "Title cannot be empty");
+  }
+
+  const result = await Category.deleteOne({
+    $and: [{ title }, { creator: req.user }],
+  });
+
+  if (result.deletedCount == 1) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Successfully deleted one category"));
+  } else {
+    throw new ApiError(404, "Could not find the category to delete");
+  }
 });
