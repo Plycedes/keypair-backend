@@ -14,7 +14,7 @@ const keyPairSchema = new Schema(
     description: {
       type: String,
     },
-    ownerId: {
+    creator: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
