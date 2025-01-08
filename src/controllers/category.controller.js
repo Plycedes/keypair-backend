@@ -60,3 +60,42 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Could not find the category to delete");
   }
 });
+
+export const editCategory = asyncHandler(async (req, res) => {
+  const { title, catId } = req.body;
+
+  if (!title) {
+    throw new ApiError(400, "Title cannot be empty");
+  }
+
+  const category = await Category.findByIdAndUpdate(
+    catId,
+    {
+      $set: {
+        title,
+      },
+    },
+    { new: true }
+  );
+
+  if (!category) {
+    throw new ApiError(404, "Could not find the category to update");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, category, "Updated one category successfully"));
+});
+
+export const getCategories = asyncHandler(async (req, res) => {
+  const categories = await Category.find({ creator: req.user });
+
+  if (!categories) {
+    throw new ApiError(404, "Could not find categories");
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, categories, "Successfully fetched all categories")
+    );
+});
