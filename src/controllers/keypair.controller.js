@@ -44,9 +44,9 @@ export const createKeyPair = asyncHandler(async (req, res) => {
 export const getAllKeyPairs = asyncHandler(async (req, res) => {
   const { catId } = req.body;
 
-  //const category = await Category.findOne({ _id: catId });
-
-  //console.log(`${category} ${req.user}`);
+  if (!catId) {
+    throw new ApiError(400, "Category Id cannot be empty");
+  }
 
   const keyPairs = await KeyPair.aggregate([
     {
@@ -79,7 +79,7 @@ export const deleteKeyPair = asyncHandler(async (req, res) => {
   const { keyPairId } = req.body;
 
   if (!keyPairId) {
-    throw new ApiError(409, "No field can be empty");
+    throw new ApiError(400, "No field can be empty");
   }
 
   const result = await KeyPair.deleteOne({
@@ -91,4 +91,32 @@ export const deleteKeyPair = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, {}, "Key Pair deleted successfully"));
   }
+});
+
+export const editKeyPair = asyncHandler(async (req, res) => {
+  const { title, value, description, catId, keyPairId } = req.body;
+
+  if (
+    [title, value, description, catId, keyPairId].some(
+      (field) => field.trim() === ""
+    )
+  ) {
+    throw new ApiError(400, "No field can be empty");
+  }
+
+  const keyPair = await KeyPair.findByIdAndUpdate(
+    keyPairId,
+    {
+      $set: {
+        title,
+        value,
+        description,
+      },
+    },
+    { new: true }
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, keyPair, "Key Pair updated successfully"));
 });
