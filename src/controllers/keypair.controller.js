@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { KeyPair } from "../models/keypair.model.js";
 import { Category } from "../models/category.model.js";
+import mongoose from "mongoose";
 
 export const createKeyPair = asyncHandler(async (req, res) => {
   const { title, value, description, catTitle } = req.body;
@@ -36,6 +37,58 @@ export const createKeyPair = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, createdKeyPair, "Successfully created the key pair")
+      new ApiResponse(200, createdKeyPair, "Successfully created the key pair ")
     );
+});
+
+export const getAllKeyPairs = asyncHandler(async (req, res) => {
+  const { catId } = req.body;
+
+  //const category = await Category.findOne({ _id: catId });
+
+  //console.log(`${category} ${req.user}`);
+
+  const keyPairs = await KeyPair.aggregate([
+    {
+      $match: {
+        category: new mongoose.Types.ObjectId(catId),
+        creator: new mongoose.Types.ObjectId(req.user._id),
+      },
+    },
+  ]);
+
+  if (!keyPairs) {
+    throw new ApiError(
+      404,
+      "Cannot find any keypair regarding the given category"
+    );
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        keyPairs,
+        "Successfully fetched all keypairs in the given category"
+      )
+    );
+});
+
+export const deleteKeyPair = asyncHandler(async (req, res) => {
+  const { keyPairId } = req.body;
+
+  if (!keyPairId) {
+    throw new ApiError(409, "No field can be empty");
+  }
+
+  const result = await KeyPair.deleteOne({
+    $and: [{ _id: keyPairId }, { creator: req.user }],
+  });
+
+  if (result.deletedCount === 1) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Key Pair deleted successfully"));
+  }
 });
