@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { Category } from "../models/category.model.js";
+import { KeyPair } from "../models/keypair.model.js";
 
 export const createCategory = asyncHandler(async (req, res) => {
   //res.status(200).json({ message: "OK" });
@@ -42,20 +43,28 @@ export const createCategory = asyncHandler(async (req, res) => {
 });
 
 export const deleteCategory = asyncHandler(async (req, res) => {
-  const { title } = req.body;
+  const { catId } = req.body;
 
-  if (!title) {
-    throw new ApiError(400, "Title cannot be empty");
+  if (!catId) {
+    throw new ApiError(400, "Category Id cannot be empty");
   }
 
+  const deletedKeyPairs = await KeyPair.deleteMany({ category: catId });
+
   const result = await Category.deleteOne({
-    $and: [{ title }, { creator: req.user }],
+    _id: catId,
   });
 
   if (result.deletedCount == 1) {
     return res
       .status(200)
-      .json(new ApiResponse(200, {}, "Successfully deleted one category"));
+      .json(
+        new ApiResponse(
+          200,
+          {},
+          `Successfully deleted one category and ${deletedKeyPairs.deletedCount} keypairs`
+        )
+      );
   } else {
     throw new ApiError(404, "Could not find the category to delete");
   }
