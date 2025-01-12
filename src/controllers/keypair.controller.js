@@ -7,14 +7,14 @@ import { Category } from "../models/category.model.js";
 import mongoose from "mongoose";
 
 export const createKeyPair = asyncHandler(async (req, res) => {
-  const { title, value, description, catTitle } = req.body;
+  const { title, value, description, catId } = req.body;
 
-  if (!title || !value || !catTitle) {
+  if (!title || !value || !catId) {
     throw new ApiError(409, "Required fields cannot be empty");
   }
 
   const category = await Category.findOne({
-    $and: [{ title: catTitle }, { creator: req.user }],
+    _id: catId,
   });
   if (!category) {
     throw new ApiError(404, "Could not find the category");
