@@ -98,7 +98,7 @@ export const editKeyPair = asyncHandler(async (req, res) => {
 
   if (
     [title, value, description, catId, keyPairId].some(
-      (field) => field.trim() === ""
+      (field) => field?.trim() === ""
     )
   ) {
     throw new ApiError(400, "No field can be empty");
